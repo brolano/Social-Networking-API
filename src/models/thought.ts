@@ -1,19 +1,77 @@
-const { Schema, model } = require ('mongoose');
+import { Schema, model, Document, Types } from 'mongoose';
 
-const thoughtSchema = new Schema({
-    thoughtText: { type: String, required: true, minlength: 1, maxlength: 200},
-    createdAt: { type: Date, default: Date.now, get: timestamp => new Date(timestamp).toLocaleString() },
-    username: { type: String, required: true },
-    reactions: [{ type: Schema.Types.ObjectId, ref: 'Reaction' }],
-}, {
-    toJSON: { virtuals: true, getters: true },
-    id: false
-});
+interface IUser extends Document {
+    username: string;
+    email: string;
+    thoughts: Types.ObjectId[];
+    friends: Types.ObjectId[];
+}
 
-thoughtSchema.virtual('reactionCount').get(function() {
-    return this.reactions.length;
-});
+const userSchema = new Schema<IUser>(
+    {
+        username: {
+            type: String,
+            required: [true, 'User is required'],
+            unique: true,
+            trim: true,
+        },
+        email: {
+            type: String,
+            required: [true, 'Email is required'],
+            unique: true,
+            match: [
+                /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+                'Please enter a valid email address'
+              ],
+        },
+        thoughts: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'Thought'
+            }
+        ],
+        friends: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'User'
+            }
+        ]
+        },
+        {
+            timestamps: true,
+            toJSON: {
+                virtuals: true,
+                getters: true,
+            },
+            id: false
+        }
+    )
 
-const Thought = model('Thought', thoughtSchema);
+    userSchema.virtual('friendCount').get(function() {
+        return this.friends.length;
+    });
 
-module.exports = Thought;
+    userSchema.pre('save', function(next) {
+        if (this.username) {
+            this.username = this.username.trim();
+        }
+        next();
+    });
+
+    userSchema.methods.addFriend = async function(friendId: Types.ObjectId) {
+        if (!this.friends.includes(friendId)) {
+          this.friends.push(friendId);
+          await this.save();
+        }
+        return this;
+      };
+      
+      userSchema.methods.removeFriend = async function(friendId: Types.ObjectId) {
+        if (this.friends.includes(friendId)) {
+          this.friends = this.friends.filter(id => !id.equals(friendId));
+          await this.save();
+        }
+        return this;
+      };
+      
+      export const User = model<IUser>('User', userSchema);
