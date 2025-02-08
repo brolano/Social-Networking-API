@@ -1,6 +1,6 @@
 import { Schema, model, Document, Types } from 'mongoose';
 
-interface IReaction extends Document {
+interface IReaction {
     reactionId: Types.ObjectId;
     reactionBody: string;
     username: string;
@@ -29,6 +29,11 @@ const reactionSchema = new Schema<IReaction>(
         username: {
             type: String,
             required: [true, 'Username is required']
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now,
+            get: (timestamp: Date) => timestamp.toLocaleString()
         }
     },
     {
@@ -47,6 +52,11 @@ const thoughtSchema = new Schema<IThought>(
             minlength: 1,
             maxlength: 280
         },
+        createdAt: {
+            type: Date,
+            default: Date.now,
+            get: (timestamp: Date) => timestamp.toLocaleString()
+        },
         username: {
             type: String,
             required: [true, 'Username is required']
@@ -63,9 +73,9 @@ const thoughtSchema = new Schema<IThought>(
     }
 );
 
-thoughtSchema.virtual('reactionCount').get(function () {
+thoughtSchema.virtual('reactionCount').get(function() {
     return this.reactions.length;
-};)
+});
 
 thoughtSchema.post('save', async function(doc) {
     try {
