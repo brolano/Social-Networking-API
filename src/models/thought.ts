@@ -68,7 +68,7 @@ const userSchema = new Schema<IUser>(
       
       userSchema.methods.removeFriend = async function(friendId: Types.ObjectId) {
         if (this.friends.includes(friendId)) {
-          this.friends = this.friends.filter(id => !id.equals(friendId));
+          this.friends = this.friends.filter((id: { equals: (arg0: Types.ObjectId) => any; }) => !id.equals(friendId));
           await this.save();
         }
         return this;
