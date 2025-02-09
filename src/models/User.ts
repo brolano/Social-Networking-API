@@ -51,27 +51,5 @@ const userSchema = new Schema<IUser>(
         return this.friends.length;
     });
 
-    userSchema.pre('save', function(next) {
-        if (this.username) {
-            this.username = this.username.trim();
-        }
-        next();
-    });
-
-    userSchema.methods.addFriend = async function(friendId: Types.ObjectId) {
-        if (!this.friends.includes(friendId)) {
-          this.friends.push(friendId);
-          await this.save();
-        }
-        return this;
-      };
-      
-      userSchema.methods.removeFriend = async function(friendId: Types.ObjectId) {
-        if (this.friends.includes(friendId)) {
-          this.friends = this.friends.filter((id: { equals: (arg0: Types.ObjectId) => any; }) => !id.equals(friendId));
-          await this.save();
-        }
-        return this;
-      };
       
       export const User = model<IUser>('User', userSchema);
