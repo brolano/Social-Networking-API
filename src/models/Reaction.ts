@@ -1,16 +1,15 @@
-import { Schema, Types } from 'mongoose';
-import { IReaction } from '../interfaces/reaction.interface';
+import { Schema, Types, Document, ObjectId } from 'mongoose';
 
 // First, let's define a dedicated interface for reactions
-export interface IReaction {
-  reactionId: Types.ObjectId;
+interface IReaction extends Document {
+  reactionId: ObjectId;
   reactionBody: string;
   username: string;
   createdAt: Date;
 }
 
 // Create the reaction schema
-export const reactionSchema = new Schema<IReaction>(
+const reactionSchema = new Schema<IReaction>(
   {
     reactionId: {
       type: Schema.Types.ObjectId,
@@ -18,17 +17,17 @@ export const reactionSchema = new Schema<IReaction>(
     },
     reactionBody: {
       type: String,
-      required: [true, 'Reaction text is required'],
-      maxlength: [280, 'Reaction must be 280 characters or less']
+      required: true,
+      maxlength: 280
     },
     username: {
       type: String,
-      required: [true, 'Username is required']
+      required: true
     },
     createdAt: {
       type: Date,
       default: Date.now,
-      get: (timestamp: Date) => timestamp.toLocaleString()
+      get: timestamp => new Date(timestamp).toLocaleString()
     }
   },
   {
@@ -36,14 +35,6 @@ export const reactionSchema = new Schema<IReaction>(
       getters: true
     },
     id: false
-  }
-);
+  });
 
-// Add any schema methods or pre/post middleware if needed
-reactionSchema.pre('save', function(next) {
-  // Ensure reactionBody is trimmed
-  if (this.reactionBody) {
-    this.reactionBody = this.reactionBody.trim();
-  }
-  next();
-});
+export default reactionSchema;
