@@ -20,14 +20,14 @@ const reactionSchema = new Schema<IReaction>(
       required: true,
       maxlength: 280
     },
-    username: {
+    username: { 
       type: String,
       required: true
     },
     createdAt: {
       type: Date,
       default: Date.now,
-      get: timestamp => new Date(timestamp).toLocaleString()
+      get: (timestamp: Date) => timestamp.toLocaleString()
     }
   },
   {
