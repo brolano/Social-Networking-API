@@ -10,6 +10,51 @@ import { Request, Response } from 'express';
     }
   }
 
+  export const updateUser = async(_req: Request, res: Response) => {
+    try {
+      const updatedUser = await User.findByIdAndUpdate(_req.params.id, _req.body, { new: true });
+      res.json(updatedUser);
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  }
+
+  export const deleteUser = async(req: Request, res: Response) => {
+    try {
+      const user = await User.findOneAndDelete({ _id: req.params.videoId });
+      if (!user) {
+        return res.status(404).json({ message: 'No video with this id!' });
+      }
+      
+      await User.findOneAndUpdate(
+        { users: req.params.userId },
+        { $pull: { users: req.params.userId } },
+        { new: true }
+      );
+  
+      if (!user) {
+        return res
+          .status(404)
+          .json({ message: 'No user with this id!' });
+      }
+  
+      res.json({ message: 'User successfully deleted!' });
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  
+    return; 
+  }
+
+  export const getUserById = async(_req: Request, res: Response) => {
+    try {
+      const users = await User.findById(_req.params.id);
+      res.json(users);
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  }
+  
   export const getSingleUser = async(req: Request, res: Response) => {
     try {
       const user = await User.findOne({ _id: req.params.userId })
