@@ -19,32 +19,32 @@ import { Request, Response } from 'express';
     }
   }
 
-  export const deleteUser = async(req: Request, res: Response) => {
+  export const deleteUser = async (req: Request, res: Response): Promise<void> => {
     try {
-      const user = await User.findOneAndDelete({ _id: req.params.videoId });
-      if (!user) {
-        return res.status(404).json({ message: 'No video with this id!' });
-      }
-      
-      await User.findOneAndUpdate(
-        { users: req.params.userId },
-        { $pull: { users: req.params.userId } },
-        { new: true }
-      );
-  
-      if (!user) {
-        return res
-          .status(404)
-          .json({ message: 'No user with this id!' });
-      }
-  
-      res.json({ message: 'User successfully deleted!' });
+        const user = await User.findByIdAndDelete({ _id: req.params.userId });
+        if (!user) {
+            res.status(404).json({ message: 'No user with this id!' });
+            return;
+        }
+        
+        await User.findOneAndUpdate(
+            { users: req.params.userId },
+            { $pull: { users: req.params.userId } },
+            { new: true }
+        );
+
+        if (!user) {
+            res.status(404).json({ message: 'No user with this id!' });
+            return;
+        }
+
+        res.json({ message: 'User successfully deleted!' });
+        return;
     } catch (err) {
-      res.status(500).json(err);
+        res.status(500).json(err);
+        return;
     }
-  
-    return; 
-  }
+};
 
   export const getUserById = async(_req: Request, res: Response) => {
     try {
