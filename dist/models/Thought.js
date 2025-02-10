@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose';
+import Reaction from './Reaction.js';
 const thoughtSchema = new Schema({
     thoughtText: {
         type: String,
@@ -8,14 +9,24 @@ const thoughtSchema = new Schema({
     },
     createdAt: {
         type: Date,
-        default: Date.now,
-        get: (timestamp) => timestamp.toLocaleString()
+        default: Date.now(),
+        get: (value) => {
+            return value.toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+        }
     },
     username: {
         type: String,
         required: [true, 'Username is required']
     },
-    reactions: [{ type: Schema.Types.ObjectId, ref: 'Reaction' }],
+    reactions: [Reaction],
 }, {
     timestamps: true,
     toJSON: {
@@ -27,4 +38,5 @@ const thoughtSchema = new Schema({
 thoughtSchema.virtual('reactionCount').get(function () {
     return this.reactions.length;
 });
-export const Thought = model('Thought', thoughtSchema);
+const Thought = model('Thought', thoughtSchema);
+export default Thought;

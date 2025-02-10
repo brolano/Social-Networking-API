@@ -1,13 +1,12 @@
 import { Schema, model, Document } from 'mongoose';
-import Reaction from './src/Reaction.js'
+import Reaction from './Reaction.js'
 
 
 interface IThought extends Document {
     thoughtText: string;
     createdAt: Date;
     username: string;
-    reactions: Reaction[];
-    reactionCount: number;
+    reactions: typeof Reaction[];
 }
 
 
@@ -21,14 +20,24 @@ const thoughtSchema = new Schema<IThought>(
         },
         createdAt: {
             type: Date,
-            default: Date.now,
-            get: (timestamp: Date) => timestamp.toLocaleString()
+            default: Date.now(),
+            get: (value: any) => {
+              return value.toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+              });
+            }
         },
         username: {
             type: String,
             required: [true, 'Username is required']
         },
-        reactions: [{ type: Schema.Types.ObjectId, ref: 'Reaction' }],
+        reactions: [Reaction],
     },
     {
         timestamps: true,
@@ -40,8 +49,10 @@ const thoughtSchema = new Schema<IThought>(
     }
 );
 
-thoughtSchema.virtual('reactionCount').get(function() {
+thoughtSchema.virtual('reactionCount').get(function () {
     return this.reactions.length;
 });
 
-export const Thought = model<IThought>('Thought', thoughtSchema);
+const Thought = model('Thought', thoughtSchema);
+
+export default Thought;

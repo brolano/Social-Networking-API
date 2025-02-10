@@ -16,8 +16,18 @@ const reactionSchema = new Schema({
     },
     createdAt: {
         type: Date,
-        default: Date.now,
-        get: (timestamp) => timestamp.toLocaleString()
+        default: Date.now(),
+        get: (value) => {
+            return value.toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+        }
     }
 }, {
     toJSON: {
