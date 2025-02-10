@@ -1,15 +1,12 @@
 import express from 'express';
-import mongoose from 'mongoose';
-require('./config/connection');
-const userRoutes = './routes/api/userRoutes';
-const thoughtRoutes = './routes/api/thoughtRoutes';
+import db from './config/connection.js';
+import routes from './routes/index.js';
+const PORT = 3001;
 const app = express();
-const PORT = process.env.PORT || 3001;
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use('/api/users', userRoutes);
-app.use('/api/thoughts', thoughtRoutes);
-mongoose.connection.once('open', () => {
+app.use(routes);
+db.once('open', () => {
     app.listen(PORT, () => {
-        console.log(`Server running on http://localhost:${PORT}`);
     });
 });
