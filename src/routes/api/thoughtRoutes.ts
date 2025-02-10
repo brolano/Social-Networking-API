@@ -5,7 +5,7 @@ import {
   createThought,
   updateThought,
   deleteThought
-} from '../../controllers/thoughtController';
+} from '../../controllers/thoughtController.js';
 
 // Create router instance
 const router: Router = express.Router();
