@@ -9,7 +9,6 @@
 - [Contributing](#contributing)
 - [Credits](#credits)
 - [Questions](#questions)
-- [React+Vite](#react--vite)
 
 ## Description
 Social Networking API that leverages a NoSQL database to add users, friends and reactions
